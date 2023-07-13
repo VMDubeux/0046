@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TargetX : MonoBehaviour
 {
-    /// <Variables>
+    #region Variables
     //Public Variables:
     public int pointValue;
     public GameObject explosionFx;
@@ -17,7 +17,8 @@ public class TargetX : MonoBehaviour
     //Private Readonly Variables:
     private readonly float minValueX = -3.75f; // the x value of the center of the left-most square
     private readonly float minValueY = -3.75f; // the y value of the center of the bottom-most square
-    private readonly float spaceBetweenSquares = 2.5f; // the distance between the centers of squares on the game board
+    private readonly float spaceBetweenSquares = 2.5f; // the distance between the centers of squares on the game board 
+    #endregion
 
 
     void Start()
@@ -29,8 +30,7 @@ public class TargetX : MonoBehaviour
         StartCoroutine(RemoveObjectRoutine()); // begin timer before target leaves screen
     }
 
-    private void OnMouseEnter() // When target is clicked, destroy it, update score, and generate explosion
-
+    private void OnMouseDown() // When target is clicked, destroy it, update score, and generate explosion
     {
         if (gameManagerX.isGameActive)
         {
@@ -55,13 +55,13 @@ public class TargetX : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter(Collider other) // If target that is the bad object collides with sensor, trigger game over
+    void OnTriggerEnter(Collider other) // If target that is the bad object collides with sensor, trigger game over
     {
         Destroy(gameObject);
 
-        if (other.gameObject.CompareTag("Sensor") && gameObject.CompareTag("Bad"))
+        if (other.gameObject.CompareTag("Sensor") && !gameObject.CompareTag("Bad"))
         {
-            gameManagerX.GameOver();
+            gameManagerX.LivesCount(1);
         }
     }
 
