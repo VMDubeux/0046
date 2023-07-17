@@ -20,7 +20,6 @@ public class TargetX : MonoBehaviour
     private readonly float spaceBetweenSquares = 2.5f; // the distance between the centers of squares on the game board 
     #endregion
 
-
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -30,13 +29,27 @@ public class TargetX : MonoBehaviour
         StartCoroutine(RemoveObjectRoutine()); // begin timer before target leaves screen
     }
 
-    private void OnMouseDown() // When target is clicked, destroy it, update score, and generate explosion
+    /*private void OnMouseDown() // When target is clicked, destroy it, update score, and generate explosion
+     {
+         if (gameManagerX.isGameActive)
+         {
+             Destroy(gameObject);
+             gameManagerX.UpdateScore(pointValue);
+             Explode();
+         }
+     }*/
+
+    public void DestroyTargetX()
     {
         if (gameManagerX.isGameActive)
         {
             Destroy(gameObject);
+            Instantiate(explosionFx, transform.position, explosionFx.transform.rotation);
             gameManagerX.UpdateScore(pointValue);
-            Explode();
+            if (gameObject.CompareTag("Bad")) 
+            {
+                gameManagerX.LivesCount(1);
+            }
         }
     }
 
@@ -45,7 +58,7 @@ public class TargetX : MonoBehaviour
         float spawnPosX = minValueX + (RandomSquareIndex() * spaceBetweenSquares);
         float spawnPosY = minValueY + (RandomSquareIndex() * spaceBetweenSquares);
 
-        Vector3 spawnPosition = new (spawnPosX, spawnPosY, 0);
+        Vector3 spawnPosition = new(spawnPosX, spawnPosY, 0);
         return spawnPosition;
     }
 
@@ -54,20 +67,14 @@ public class TargetX : MonoBehaviour
         return Random.Range(0, 4);
     }
 
-
-    void OnTriggerEnter(Collider other) // If target that is the bad object collides with sensor, trigger game over
+    void OnTriggerEnter(Collider other) // If target that is the bad object collides with sensor
     {
         Destroy(gameObject);
 
-        if (other.gameObject.CompareTag("Sensor") && !gameObject.CompareTag("Bad"))
+        if (gameManagerX.isGameActive && other.gameObject.CompareTag("Sensor") && !gameObject.CompareTag("Bad"))
         {
             gameManagerX.LivesCount(1);
         }
-    }
-
-    void Explode() // Display explosion particle at object's position
-    {
-        Instantiate(explosionFx, transform.position, explosionFx.transform.rotation);
     }
 
     IEnumerator RemoveObjectRoutine() // After a delay, Moves the object behind background so it collides with the Sensor object

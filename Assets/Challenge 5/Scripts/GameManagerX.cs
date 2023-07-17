@@ -19,16 +19,14 @@ public class GameManagerX : MonoBehaviour
     public Button restartButton;
     public List<GameObject> targetPrefabs;
     public bool isGameActive;
+    public bool menuTitleActive = true;
     public GameObject PauseMenu;
-    public Slider Volume;
 
     //Private Variables:
     private int score;
     private float time = 60.0f;
     private float spawnRate = 1.5f;
     private int lives = 3;
-    private AudioSource _audioSource;
-    private AudioClip _audioClip;
 
     //Private Readonly Variables:
     private readonly float spaceBetweenSquares = 2.5f;
@@ -38,18 +36,18 @@ public class GameManagerX : MonoBehaviour
 
     void Start()
     {
-        _audioSource.GetComponent<AudioSource>();
-        _audioSource.clip = _audioClip;
+        
     }
 
     private void Update()
     {
-        EnablePauseMenu();
-        //SetVolume();
-
         if (isGameActive == true)
         {
             Timing();
+        }
+        if (menuTitleActive == false)
+        {
+            EnablePauseMenu();
         }
     }
 
@@ -72,14 +70,22 @@ public class GameManagerX : MonoBehaviour
         if (lives <= 0) GameOver();
     }
 
+    public void UpdateScore(int scoreToAdd) // Update score with value from target clicked
+    {
+        score += scoreToAdd;
+        scoreText.text = $"Score: {score}";
+    }
+
     public void StartGame(int difficulty) // Start the game, remove title screen, reset score, and adjust spawnRate based on difficulty button clicked
     {
-        spawnRate /= difficulty;
         isGameActive = true;
-        StartCoroutine(SpawnTarget());
         score = 0;
+        spawnRate /= difficulty;
+
+        StartCoroutine(SpawnTarget());
         UpdateScore(0);
         titleScreen.SetActive(false);
+        menuTitleActive = false;
         scoreText.text = $"Score: {score}";
         timerText.text = $"Timer: {time:00}";
         livesText.text = $"Lives: {lives:00}";
@@ -113,13 +119,7 @@ public class GameManagerX : MonoBehaviour
         return Random.Range(0, 4);
     }
 
-    public void UpdateScore(int scoreToAdd) // Update score with value from target clicked
-    {
-        score += scoreToAdd;
-        scoreText.text = $"Score: {score}";
-    }
-
-    void EnablePauseMenu() 
+    void EnablePauseMenu()
     {
         if (Input.GetKeyDown(KeyCode.Escape) && isGameActive == true)
         {
@@ -134,11 +134,6 @@ public class GameManagerX : MonoBehaviour
             isGameActive = true;
         }
     }
-
-    /*void SetVolume() 
-    {
-        _audioSource.volume = Volume.value;
-    }*/
 
     public void GameOver() // Stop game, bring up game over text and restart button
     {
